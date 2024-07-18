@@ -17,7 +17,7 @@ RED='\033[0;31m'
 BLUE='\033[0;34m'
 MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color 
-Clear
+
     echo -e "${Purple}"
     cat << "EOF"
           
@@ -492,8 +492,8 @@ elif [ "$choice" -eq 10 ]; then
         echo $'\e[32mUninstallation canceled.\e[0m'
     fi
     
-# If option 11 is selected
-elif [ "$choice" -eq 11 ]; then
+# If option 9 is selected
+elif [ "$choice" -eq 9 ]; then
     echo $'\e[32mYou have exited the script.\e[0m'
     exit
 fi
