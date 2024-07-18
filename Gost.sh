@@ -126,13 +126,13 @@ systemctl enable sysctl-custom
     echo $'\e[32mSystem update completed.\e[0m'
     # Prompt user to choose Gost version
     echo $'\e[32mChoose Gost version:\e[0m'
-    echo $'\e[36m2. \e[0mGost version 3.0.0 (latest)'
+    echo $'\e[36m1. \e[0mGost version 3.0.0 (latest)'
 
     # Read user input for Gost version
     read -p $'\e[97mYour choice: \e[0m' gost_version_choice
 
     # Download and install Gost based on user's choice
-        if [ "$gost_version_choice" -eq 2 ]; then
+        if [ "$gost_version_choice" -eq 1 ]; then
     echo $'\e[32mInstalling Gost version 3.0.0, please wait...\e[0m'
     wget -O /tmp/gost.tar.gz https://github.com/iPmartNetwork/GOST/releases/download/v3.0.0-nightly.20240715/gost_3.0.0-nightly.20240715_linux_amd64.tar.gz
     tar -xvzf /tmp/gost.tar.gz -C /usr/local/bin/
