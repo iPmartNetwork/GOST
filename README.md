@@ -8,11 +8,6 @@
 <h6 align="center"> تانل گاست  <h6>
 </p>
 
-<p align="center">
-  <a href="https://github.com/ipmartnetwork/RatholeTunnel">
-    <img src="rathol.png" alt="Logo"  >
-  </a>
-</p>
 
 
 ## پیش نیاز
