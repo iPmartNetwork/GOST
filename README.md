@@ -54,6 +54,11 @@
 
 [لینک اصلی پروژه](https://github.com/go-gost/gost/)
 
+[تشکر ویژه از مسعود عزیز](https://github.com/masoudgb)
+
+
+
+
 
 
 # تلگرام
