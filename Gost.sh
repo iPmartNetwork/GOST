@@ -17,7 +17,7 @@ RED='\033[0;31m'
 BLUE='\033[0;34m'
 MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color 
-    Clear
+Clear
     echo -e "${Purple}"
     cat << "EOF"
           
