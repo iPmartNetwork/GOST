@@ -331,7 +331,7 @@ elif [ "$choice" -eq 6 ]; then
     # Download and install Gost based on user's choice
     case "$gost_version_choice" in
         1)
-            echo $'\e[32mInstalling Gost version 3.0.0, please wait...\e[0m' && \
+            echo $'\e[32mInstalling Gost Last version, please wait...\e[0m' && \
             wget -O /tmp/gost.tar.gz https://github.com/iPmartNetwork/GOST/releases/download/v3.0.0-nightly.20240715/gost_3.0.0-nightly.20240715_linux_amd64.tar.gz
     tar -xvzf /tmp/gost.tar.gz -C /usr/local/bin/
     chmod +x /usr/local/bin/gost
