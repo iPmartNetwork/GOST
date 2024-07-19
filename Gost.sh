@@ -189,10 +189,10 @@ fi
     # Commands to install and configure Gost
     sudo apt install wget nano -y && \
 echo $'\e[32mInstalling Gost version v3.0.0, please wait...\e[0m' && \
-wget https://github.com/iPmartNetwork/GOST/releases/download/v3.0.0-nightly.20240715/gost_3.0.0-nightly.20240715_linux_amd64.tar.gz && \
+wget https://github.com/iPmartNetwork/GOST/releases/download/v3.0.0-nightly.20240715/gost_3.0.0.tar.gz && \
 echo $'\e[32mGost downloaded successfully.\e[0m' && \
-gunzip gost_3.0.0-nightly.20240715_linux_amd64.tar.gz && \
-sudo mv gost_3.0.0-nightly.20240715_linux_amd64.tar.gz /usr/local/bin/gost && \
+gunzip gost_3.0.0.tar.gz && \
+sudo mv gost_3.0.0.tar.gz /usr/local/bin/gost && \
 sudo chmod +x /usr/local/bin/gost && \
 echo $'\e[32mGost installed successfully.\e[0m'
 
