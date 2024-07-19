@@ -43,9 +43,9 @@ echo "════════════════════════�
 options=($'\e[36m1. \e[0mIP Local'
          $'\e[36m2. \e[0mGost Tunnel By IP4'
          $'\e[36m3. \e[0mGost Tunnel By IP6'
-         $'\e[36m4. \e[0m |Gost Status'
-         $'\e[36m5. \e[0m |Auto Restart Gost'
-         $'\e[36m6. \e[0m |Auto Clear Cache'
+         $'\e[36m4. \e[0mGost Status'
+         $'\e[36m5. \e[0mAuto Restart Gost'
+         $'\e[36m6. \e[0mAuto Clear Cache'
          $'\e[36m7. \e[0mUninstall'
          $'\e[36m0. \e[0mExit')
 
