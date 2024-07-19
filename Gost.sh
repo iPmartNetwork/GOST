@@ -322,9 +322,38 @@ fi
 
 # If option 6 is selected
 elif [ "$choice" -eq 6 ]; then
-    # Countdown for uninstallation in a single line
-    echo $'\e[32mUninstalling Gost in 3 seconds... \e[0m' && sleep 1 && echo $'\e[32m2... \e[0m' && sleep 1 && echo $'\e[32m1... \e[0m' && sleep 1 && { sudo rm -f /usr/local/bin/gost && sudo rm -f /usr/lib/systemd/system/gost.service && echo $'\e[32mGost successfully uninstalled.\e[0m'; }
+    # Prompt the user for confirmation
+    read -p $'\e[91mWarning\e[33m: This will uninstall Gost and remove all related data. Are you sure you want to continue? (y/n): ' uninstall_confirm
 
+    # Check user confirmation
+    if [ "$uninstall_confirm" == "y" ]; then
+        # Countdown for uninstallation in a single line
+        echo $'\e[32mUninstalling Gost in 3 seconds... \e[0m' && sleep 1 && echo $'\e[32m2... \e[0m' && sleep 1 && echo $'\e[32m1... \e[0m' && sleep 1 && {
+            # Remove the auto_restart_cronjob.sh script
+            sudo rm -f /usr/bin/auto_restart_cronjob.sh
+
+            # Remove the cron job for Auto Restart
+            crontab -l | grep -v '/usr/bin/auto_restart_cronjob.sh' | crontab -
+
+            # Continue with the rest of the uninstallation process
+            sudo systemctl daemon-reload
+            sudo systemctl stop gost_*.service
+            sudo rm -f /usr/local/bin/gost
+            sudo rm -rf /etc/gost
+            sudo rm -f /usr/lib/systemd/system/gost_*.service
+            sudo rm -f /etc/systemd/system/multi-user.target.wants/gost_*.service
+            systemctl stop sysctl-custom
+            systemctl disable sysctl-custom
+            sudo rm -f /etc/systemd/system/sysctl-custom.service
+            sudo rm -f /etc/systemd/system/multi-user.target.wants/sysctl-custom.service
+            systemctl daemon-reload
+            
+            echo $'\e[32mGost successfully uninstalled.\e[0m'
+        }
+    else
+        echo $'\e[32mUninstallation canceled.\e[0m'
+    fi
+    
 # If option 0 is selected
 elif [ "$choice" -eq 0 ]; then
     echo $'\e[32mYou have exited the script.\e[0m'
