@@ -40,13 +40,12 @@ echo "════════════════════════�
 
 
 
-options=($'\e[36m1. \e[0mIP Local'
-         $'\e[36m2. \e[0mGost Tunnel By IP4'
-         $'\e[36m3. \e[0mGost Tunnel By IP6'
-         $'\e[36m4. \e[0mGost Status'
-         $'\e[36m5. \e[0mAuto Restart Gost'
-         $'\e[36m6. \e[0mAuto Clear Cache'
-         $'\e[36m7. \e[0mUninstall'
+options=($'\e[36m1. \e[0mGost Tunnel By IP4'
+         $'\e[36m2. \e[0mGost Tunnel By IP6'
+         $'\e[36m3. \e[0mGost Status'
+         $'\e[36m4. \e[0mAuto Restart Gost'
+         $'\e[36m5. \e[0mAuto Clear Cache'
+         $'\e[36m6. \e[0mUninstall'
          $'\e[36m0. \e[0mExit')
 
 # Print prompt and options with cyan color
@@ -56,116 +55,25 @@ printf "%s\n" "${options[@]}"
 # Read user input with white color
 read -p $'\e[97mYour choice: \e[0m' choice
 
-# If option 1 is selected
-echo "01. Iran"
-echo "02. Kharej"
-echo "03. uninstall"
-# Prompt user for IP addresses
-read -p "Select number : " choices
-if [ "$choices" -eq 01 ]; then
-  ipv4_address=$(curl -s https://api.ipify.org)
-  echo "Iran IPv4 is : $ipv4_address"
-  read -p "enter Kharej Ipv4: " ip_remote
-rctext='#!/bin/bash
-
-ip tunnel add 6to4tun_IR mode sit remote '"$ip_remote"' local '"$ipv4_address"'
-ip -6 addr add fd51:7b73:0b36::1/64 dev 6to4tun_IR
-ip link set 6to4tun_IR mtu 1480
-ip link set 6to4tun_IR up
-# confige tunnele GRE6 ya IPIPv6 IR
-ip -6 tunnel add GRE6Tun_IR mode ip6gre remote fd51:7b73:0b36::2 local fd51:7b73:0b36::1
-ip addr add 172.16.1.1/30 dev GRE6Tun_IR
-ip link set GRE6Tun_IR mtu 1436
-ip link set GRE6Tun_IR up
-
-iptables -F
-iptables -X
-iptables -t nat -F
-iptables -t nat -X
-iptables -t mangle -F
-iptables -t mangle -X
-iptables -P INPUT ACCEPT
-iptables -P FORWARD ACCEPT
-iptables -P OUTPUT ACCEPT
-iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-iptables -A FORWARD  -j ACCEPT
-echo "net.ipv4.ip_forward=1" > /etc/sysctl.conf
-sysctl -p
-'
-  sleep 0.5
-  echo "$rctext" > /etc/rc.local
-elif [ "$choices" -eq 02 ]; then
-  ipv4_address=$(curl -s https://api.ipify.org)
-  echo "Kharej IPv4 is : $ipv4_address"
-  read -p "enter Iran Ip : " ip_remote
-  rctext='#!/bin/bash
-ip tunnel add 6to4tun_KH mode sit remote '"$ip_remote"' local '"$ipv4_address"'
-ip -6 addr add fd51:7b73:0b36::2/64 dev 6to4tun_KH
-ip link set 6to4tun_KH mtu 1480
-ip link set 6to4tun_KH up
-
-ip -6 tunnel add GRE6Tun_KH mode ip6gre remote fd51:7b73:0b36::1 local fd51:7b73:0b36::2
-ip addr add 172.16.1.2/30 dev GRE6Tun_KH
-ip link set GRE6Tun_KH mtu 1436
-ip link set GRE6Tun_KH up
-
-iptables -F
-iptables -X
-iptables -t nat -F
-iptables -t nat -X
-iptables -t mangle -F
-iptables -t mangle -X
-iptables -P INPUT ACCEPT
-iptables -P FORWARD ACCEPT
-iptables -P OUTPUT ACCEPT
-iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-iptables -A FORWARD  -j ACCEPT
-echo "net.ipv4.ip_forward=1" > /etc/sysctl.conf
-sysctl -p
-'
-  sleep 0.5
-  echo "$rctext" > /etc/rc.local
-elif [ "$choices" -eq 03 ]; then
-sudo ip link show | awk '/6to4tun/ {split($2,a,"@"); print a[1]}' | xargs -I {} sudo ip link set {} down
-sudo ip link show | awk '/6to4tun/ {split($2,a,"@"); print a[1]}' | xargs -I {} sudo ip tunnel del {}
-sudo ip link show | awk '/GRE6Tun/ {split($2,a,"@"); print a[1]}' | xargs -I {} sudo ip link set {} down
-sudo ip link show | awk '/GRE6Tun/ {split($2,a,"@"); print a[1]}' | xargs -I {} sudo ip tunnel del {}
-sudo echo > /etc/rc.local
-echo "uninstalled successfully"
-read -p "do you want to reboot?(recommended)[y/n] : " yes_no
-	if [[ $yes_no =~ ^[Yy]$ ]] || [[ $yes_no =~ ^[Yy]es$ ]]; then
- 		sudo reboot
-	fi
-else
-  echo "wrong input"
-fi
-
-chmod +x /etc/rc.local
-sleep 0.5
-/etc/rc.local
-
-echo "IP Kharej: fd51:7b73:0b36::2"
-echo "IP Iran: fd51:7b73:0b36::1"
-
-# If option 2 or 3 is selected
+# If option 1 or 2 is selected
 if [ "$choice" -eq 2 ] || [ "$choice" -eq 3 ]; then
 
-    if [ "$choice" -eq 2 ]; then
+    if [ "$choice" -eq 1 ]; then
         read -p $'\e[97mPlease enter the destination Kharej IP: \e[0m' destination_ip
-    elif [ "$choice" -eq 3 ]; then
+    elif [ "$choice" -eq 2 ]; then
         read -p $'\e[97mPlease enter the destination Kharej IPv6: \e[0m' destination_ip
     fi
 
     read -p $'\e[32mPlease choose one of the options below:\n\e[0m\e[32m1. \e[0mEnter Manually Ports\n\e[32m2. \e[0mEnter Range Ports\e[32m\nYour choice: \e[0m' port_option
 
-    if [ "$port_option" -eq 2 ]; then
+    if [ "$port_option" -eq 1 ]; then
         read -p $'\e[97mPlease enter the desired ports (separated by commas): \e[0m' ports
-    elif [ "$port_option" -eq 3 ]; then
+    elif [ "$port_option" -eq 2 ]; then
         read -p $'\e[97mPlease enter the port range (e.g., 1,65535): \e[0m' port_range
         IFS=',' read -ra port_array <<< "$port_range"
         ports=$(IFS=,; echo "${port_array[*]}")
     else
-        echo $'\e[31mInvalid option. Exiting...\e[0m'
+        echo $'\e[31mInvalid option. Exit...\e[0m'
         exit
     fi
 
@@ -269,8 +177,8 @@ EOL
     sudo systemctl restart gost.service
     echo $'\e[32mGost configuration applied successfully.\e[0m'
 
-# If option 4 is selected
-elif [ "$choice" -eq 4 ]; then
+# If option 3 is selected
+elif [ "$choice" -eq 3 ]; then
     # Check if Gost is installed
     if command -v gost &>/dev/null; then
         echo $'\e[32mGost is installed. Checking configuration and status...\e[0m'
@@ -305,8 +213,8 @@ if [ "$choice" -eq 0 ]; then
     bash "$0"
 fi
 
-# If option 5 is selected
-elif [ "$choice" -eq 5 ]; then
+# If option 4 is selected
+elif [ "$choice" -eq 4 ]; then
     echo $'\e[32mChoose Auto Restart option:\e[0m'
     echo $'\e[36m1. \e[0mEnable Auto Restart'
     echo $'\e[36m2. \e[0mDisable Auto Restart'
@@ -358,8 +266,8 @@ elif [ "$choice" -eq 5 ]; then
  bash "$0"
 fi
 
-# If option 6 is selected
-if [ "$choice" -eq 6 ]; then
+# If option 5 is selected
+if [ "$choice" -eq 5 ]; then
     echo $'\e[32mChoose Auto Clear Cache option:\e[0m'
     echo $'\e[36m1. \e[0mEnable Auto Clear Cache'
     echo $'\e[36m2. \e[0mDisable Auto Clear Cache'
@@ -404,20 +312,20 @@ if [ "$choice" -eq 6 ]; then
             disable_auto_clear_cache
             ;;
         *)
-            echo $'\e[31mInvalid choice. Exit...\e[0m'
+            echo $'\e[31mInvalid choice. Exiting...\e[0m'
             exit
             ;;
     esac
  bash "$0"
 fi
 
-# If option 7 is selected
-elif [ "$choice" -eq 7 ]; then
+# If option 6 is selected
+elif [ "$choice" -eq 6 ]; then
     # Countdown for uninstallation in a single line
     echo $'\e[32mUninstalling Gost in 3 seconds... \e[0m' && sleep 1 && echo $'\e[32m2... \e[0m' && sleep 1 && echo $'\e[32m1... \e[0m' && sleep 1 && { sudo rm -f /usr/local/bin/gost && sudo rm -f /usr/lib/systemd/system/gost.service && echo $'\e[32mGost successfully uninstalled.\e[0m'; }
 
-# If option 4 is selected
-elif [ "$choice" -eq 4 ]; then
+# If option 0 is selected
+elif [ "$choice" -eq 0 ]; then
     echo $'\e[32mYou have exited the script.\e[0m'
     exit
 fi
