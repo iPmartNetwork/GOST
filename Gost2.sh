@@ -161,11 +161,11 @@ if [ "$choices" -eq 01 ]; then
 rctext='#!/bin/bash
 
 ip tunnel add 6to4tun_IR mode sit remote '"$ip_remote"' local '"$ipv4_address"'
-ip -6 addr add fd51:7b73:0b36::1/64 dev 6to4tun_IR
+ip -6 addr add fdb8:bfa0:a95a::1/64 dev 6to4tun_IR
 ip link set 6to4tun_IR mtu 1480
 ip link set 6to4tun_IR up
 # confige tunnele GRE6 ya IPIPv6 IR
-ip -6 tunnel add GRE6Tun_IR mode ip6gre remote fd51:7b73:0b36::2 local fd51:7b73:0b36::1
+ip -6 tunnel add GRE6Tun_IR mode ip6gre remote fdb8:bfa0:a95a::2 local fdb8:bfa0:a95a::1
 ip addr add 172.16.1.1/30 dev GRE6Tun_IR
 ip link set GRE6Tun_IR mtu 1436
 ip link set GRE6Tun_IR up
@@ -192,11 +192,11 @@ elif [ "$choices" -eq 02 ]; then
   read -p "enter Iran Ip : " ip_remote
   rctext='#!/bin/bash
 ip tunnel add 6to4tun_KH mode sit remote '"$ip_remote"' local '"$ipv4_address"'
-ip -6 addr add fd51:7b73:0b36::2/64 dev 6to4tun_KH
+ip -6 addr add fdb8:bfa0:a95a::2/64 dev 6to4tun_KH
 ip link set 6to4tun_KH mtu 1480
 ip link set 6to4tun_KH up
 
-ip -6 tunnel add GRE6Tun_KH mode ip6gre remote fd51:7b73:0b36::1 local fd51:7b73:0b36::2
+ip -6 tunnel add GRE6Tun_KH mode ip6gre remote fdb8:bfa0:a95a::1 local fdb8:bfa0:a95a::2
 ip addr add 172.16.1.2/30 dev GRE6Tun_KH
 ip link set GRE6Tun_KH mtu 1436
 ip link set GRE6Tun_KH up
