@@ -45,7 +45,8 @@ options=($'\e[36m1. \e[0mGost Tunnel By IP4'
          $'\e[36m3. \e[0mGost Status'
          $'\e[36m4. \e[0mAuto Restart Gost'
          $'\e[36m5. \e[0mAuto Clear Cache'
-         $'\e[36m6. \e[0mUninstall'
+         $'\e[36m6. \e[0mInstall BBR'
+         $'\e[36m7. \e[0mUninstall'
          $'\e[36m0. \e[0mExit')
 
 # Print prompt and options with cyan color
@@ -59,9 +60,9 @@ read -p $'\e[97mYour choice: \e[0m' choice
 if [ "$choice" -eq 1 ] || [ "$choice" -eq 2 ]; then
 
     if [ "$choice" -eq 1 ]; then
-        read -p $'\e[97mPlease enter the destination (Kharej) IP: \e[0m' destination_ip
+        read -p $'\e[97mPlease enter the destination Kharej IP: \e[0m' destination_ip
     elif [ "$choice" -eq 2 ]; then
-        read -p $'\e[97mPlease enter the destination (Kharej) IPv6: \e[0m' destination_ip
+        read -p $'\e[97mPlease enter the destination Kharej IPv6: \e[0m' destination_ip
     fi
 
     read -p $'\e[32mPlease choose one of the options below:\n\e[0m\e[32m1. \e[0mEnter Manually Ports\n\e[32m2. \e[0mEnter Range Ports\e[32m\nYour choice: \e[0m' port_option
@@ -98,10 +99,10 @@ fi
     # Commands to install and configure Gost
     sudo apt install wget nano -y && \
 echo $'\e[32mInstalling Gost version 2.11.5, please wait...\e[0m' && \
-wget https://github.com/iPmartNetwork/GOST/releases/download/v3.0.0-nightly.20240715/gost_3.0.0.tar.gz && \
+wget https://github.com/ginuerzh/gost/releases/download/v2.11.5/gost-linux-amd64-2.11.5.gz && \
 echo $'\e[32mGost downloaded successfully.\e[0m' && \
-gunzip gost_3.0.0.tar.gz && \
-sudo mv gost_3.0.0.tar.gz /usr/local/bin/gost && \
+gunzip gost-linux-amd64-2.11.5.gz && \
+sudo mv gost-linux-amd64-2.11.5 /usr/local/bin/gost && \
 sudo chmod +x /usr/local/bin/gost && \
 echo $'\e[32mGost installed successfully.\e[0m'
 
@@ -321,10 +322,47 @@ if [ "$choice" -eq 5 ]; then
 fi
 
 # If option 6 is selected
-elif [ "$choice" -eq 6 ]; then
-    # Countdown for uninstallation in a single line
-    echo $'\e[32mUninstalling Gost in 3 seconds... \e[0m' && sleep 1 && echo $'\e[32m2... \e[0m' && sleep 1 && echo $'\e[32m1... \e[0m' && sleep 1 && { sudo rm -f /usr/local/bin/gost && sudo rm -f /usr/lib/systemd/system/gost.service && echo $'\e[32mGost successfully uninstalled.\e[0m'; }
+if [ "$choice" -eq 6 ]; then
+    echo $'\e[32mInstalling BBR, please wait...\e[0m' && \
+    wget -N --no-check-certificate https://github.com/ipmartnetwork/BBr/raw/mainr/bbr.sh && \
+    chmod +x bbr.sh && \
+    bash bbr.sh
+    bash "$0"
 
+# If option 7 is selected
+elif [ "$choice" -eq 7 ]; then
+    # Prompt the user for confirmation
+    read -p $'\e[91mWarning\e[33m: This will uninstall Gost and remove all related data. Are you sure you want to continue? (y/n): ' uninstall_confirm
+
+    # Check user confirmation
+    if [ "$uninstall_confirm" == "y" ]; then
+        # Countdown for uninstallation in a single line
+        echo $'\e[32mUninstalling Gost in 3 seconds... \e[0m' && sleep 1 && echo $'\e[32m2... \e[0m' && sleep 1 && echo $'\e[32m1... \e[0m' && sleep 1 && {
+            # Remove the auto_restart_cronjob.sh script
+            sudo rm -f /usr/bin/auto_restart_cronjob.sh
+
+            # Remove the cron job for Auto Restart
+            crontab -l | grep -v '/usr/bin/auto_restart_cronjob.sh' | crontab -
+
+            # Continue with the rest of the uninstallation process
+            sudo systemctl daemon-reload
+            sudo systemctl stop gost_*.service
+            sudo rm -f /usr/local/bin/gost
+            sudo rm -rf /etc/gost
+            sudo rm -f /usr/lib/systemd/system/gost_*.service
+            sudo rm -f /etc/systemd/system/multi-user.target.wants/gost_*.service
+            systemctl stop sysctl-custom
+            systemctl disable sysctl-custom
+            sudo rm -f /etc/systemd/system/sysctl-custom.service
+            sudo rm -f /etc/systemd/system/multi-user.target.wants/sysctl-custom.service
+            systemctl daemon-reload
+            
+            echo $'\e[32mGost successfully uninstalled.\e[0m'
+        }
+    else
+        echo $'\e[32mUninstallation canceled.\e[0m'
+    fi
+    
 # If option 0 is selected
 elif [ "$choice" -eq 0 ]; then
     echo $'\e[32mYou have exited the script.\e[0m'
