@@ -260,7 +260,7 @@ elif [ "$choice" -eq 5 ]; then
             echo $'\e[32mAuto Restart disabled successfully.\e[0m'
             ;;
         *)
-            echo $'\e[31mInvalid choice. Exiting...\e[0m'
+            echo $'\e[31mInvalid choice. Exit...\e[0m'
             exit
             ;;
     esac
