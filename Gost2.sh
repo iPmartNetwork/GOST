@@ -18,101 +18,6 @@ if [ "$EUID" -ne 0 ]; then
   exit
 fi
 
-# Paths
-HOST_PATH="/etc/hosts"
-DNS_PATH="/etc/resolv.conf"
-
-# Green, Yellow & Red Messages.
-green_msg() {
-    tput setaf 2
-    echo "[*] ----- $1"
-    tput sgr0
-}
-
-yellow_msg() {
-    tput setaf 3
-    echo "[*] ----- $1"
-    tput sgr0
-}
-
-red_msg() {
-    tput setaf 1
-    echo "[*] ----- $1"
-    tput sgr0
-}
-
-# Function to update system and install sqlite3
-install_dependencies() {
-    echo -e "${BLUE}Updating package list...${NC}"
-    sudo apt update -y
-
-    echo -e "${BLUE}Installing openssl...${NC}"
-    sudo apt install -y openssl
-
-    echo -e "${BLUE}Installing jq...${NC}"
-    sudo apt install -y jq
-
-    echo -e "${BLUE}Installing curl...${NC}"
-    sudo apt install -y curl
-
-    echo -e "${BLUE}Installing ufw...${NC}"
-    sudo apt install -y ufw
-
-    sudo apt -y install apt-transport-https locales apt-utils bash-completion libssl-dev socat
-
-    sudo apt -y -q autoclean
-    sudo apt install iptables -y
-    sudo apt -y clean
-    sudo apt -q update
-    sudo apt -y autoremove --purge
-}
-check_root() {
-    if [[ $EUID -ne 0 ]]; then
-        echo -e "${Purple}This script must be run as root. Please run it with sudo.${NC}"
-        exit 1
-    fi
-}
-
-fix_etc_hosts(){
-  echo
-  yellow_msg "Fixing Hosts file."
-  sleep 0.5
-
-  cp $HOST_PATH /etc/hosts.bak
-  yellow_msg "Default hosts file saved. Directory: /etc/hosts.bak"
-  sleep 0.5
-
-  # shellcheck disable=SC2046
-  if ! grep -q $(hostname) $HOST_PATH; then
-    echo "127.0.1.1 $(hostname)" | sudo tee -a $HOST_PATH > /dev/null
-    green_msg "Hosts Fixed."
-    echo
-    sleep 0.5
-  else
-    green_msg "Hosts OK. No changes made."
-    echo
-    sleep 0.5
-  fi
-}
-
-fix_dns(){
-    echo
-    yellow_msg "Fixing DNS Temporarily."
-    sleep 0.5
-
-    cp $DNS_PATH /etc/resolv.conf.bak
-    yellow_msg "Default resolv.conf file saved. Directory: /etc/resolv.conf.bak"
-    sleep 0.5
-
-    sed -i '/nameserver/d' $DNS_PATH
-
-    echo "nameserver 8.8.8.8" >> $DNS_PATH
-    echo "nameserver 8.8.4.4" >> $DNS_PATH
-
-    green_msg "DNS Fixed Temporarily."
-    echo
-    sleep 0.5
-}
 
     echo -e "${Purple}"
     cat << "EOF"
@@ -138,7 +43,10 @@ echo "════════════════════════�
 options=($'\e[36m1. \e[0mIP Local'
          $'\e[36m2. \e[0mGost Tunnel By IP4'
          $'\e[36m3. \e[0mGost Tunnel By IP6'
-         $'\e[36m4. \e[0mUninstall'
+         $'\e[36m4. \e[0m |Gost Status'
+         $'\e[36m5. \e[0m |Auto Restart Gost'
+         $'\e[36m6. \e[0m |Auto Clear Cache'
+         $'\e[36m7. \e[0mUninstall'
          $'\e[36m0. \e[0mExit')
 
 # Print prompt and options with cyan color
@@ -147,94 +55,6 @@ printf "%s\n" "${options[@]}"
 
 # Read user input with white color
 read -p $'\e[97mYour choice: \e[0m' choice
-
-# If option 1 is selected
-echo "01. Iran"
-echo "02. Kharej"
-echo "03. uninstall"
-# Prompt user for IP addresses
-read -p "Select number : " choices
-if [ "$choices" -eq 01 ]; then
-  ipv4_address=$(curl -s https://api.ipify.org)
-  echo "Iran IPv4 is : $ipv4_address"
-  read -p "enter Kharej Ipv4: " ip_remote
-rctext='#!/bin/bash
-
-ip tunnel add 6to4tun_IR mode sit remote '"$ip_remote"' local '"$ipv4_address"'
-ip -6 addr add fdb8:bfa0:a95a::1/64 dev 6to4tun_IR
-ip link set 6to4tun_IR mtu 1480
-ip link set 6to4tun_IR up
-# confige tunnele GRE6 ya IPIPv6 IR
-ip -6 tunnel add GRE6Tun_IR mode ip6gre remote fdb8:bfa0:a95a::2 local fdb8:bfa0:a95a::1
-ip addr add 172.16.1.1/30 dev GRE6Tun_IR
-ip link set GRE6Tun_IR mtu 1436
-ip link set GRE6Tun_IR up
-
-iptables -F
-iptables -X
-iptables -t nat -F
-iptables -t nat -X
-iptables -t mangle -F
-iptables -t mangle -X
-iptables -P INPUT ACCEPT
-iptables -P FORWARD ACCEPT
-iptables -P OUTPUT ACCEPT
-iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-iptables -A FORWARD  -j ACCEPT
-echo "net.ipv4.ip_forward=1" > /etc/sysctl.conf
-sysctl -p
-'
-  sleep 0.5
-  echo "$rctext" > /etc/rc.local
-elif [ "$choices" -eq 02 ]; then
-  ipv4_address=$(curl -s https://api.ipify.org)
-  echo "Kharej IPv4 is : $ipv4_address"
-  read -p "enter Iran Ip : " ip_remote
-  rctext='#!/bin/bash
-ip tunnel add 6to4tun_KH mode sit remote '"$ip_remote"' local '"$ipv4_address"'
-ip -6 addr add fdb8:bfa0:a95a::2/64 dev 6to4tun_KH
-ip link set 6to4tun_KH mtu 1480
-ip link set 6to4tun_KH up
-
-ip -6 tunnel add GRE6Tun_KH mode ip6gre remote fdb8:bfa0:a95a::1 local fdb8:bfa0:a95a::2
-ip addr add 172.16.1.2/30 dev GRE6Tun_KH
-ip link set GRE6Tun_KH mtu 1436
-ip link set GRE6Tun_KH up
-
-iptables -F
-iptables -X
-iptables -t nat -F
-iptables -t nat -X
-iptables -t mangle -F
-iptables -t mangle -X
-iptables -P INPUT ACCEPT
-iptables -P FORWARD ACCEPT
-iptables -P OUTPUT ACCEPT
-iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-iptables -A FORWARD  -j ACCEPT
-echo "net.ipv4.ip_forward=1" > /etc/sysctl.conf
-sysctl -p
-'
-  sleep 0.5
-  echo "$rctext" > /etc/rc.local
-elif [ "$choices" -eq 03 ]; then
-sudo ip link show | awk '/6to4tun/ {split($2,a,"@"); print a[1]}' | xargs -I {} sudo ip link set {} down
-sudo ip link show | awk '/6to4tun/ {split($2,a,"@"); print a[1]}' | xargs -I {} sudo ip tunnel del {}
-sudo ip link show | awk '/GRE6Tun/ {split($2,a,"@"); print a[1]}' | xargs -I {} sudo ip link set {} down
-sudo ip link show | awk '/GRE6Tun/ {split($2,a,"@"); print a[1]}' | xargs -I {} sudo ip tunnel del {}
-sudo echo > /etc/rc.local
-echo "uninstalled successfully"
-read -p "do you want to reboot?(recommended)[y/n] : " yes_no
-	if [[ $yes_no =~ ^[Yy]$ ]] || [[ $yes_no =~ ^[Yy]es$ ]]; then
- 		sudo reboot
-	fi
-else
-  echo "wrong input"
-fi
-
-chmod +x /etc/rc.local
-sleep 0.5
-/etc/rc.local
 
 # If option 2 or 3 is selected
 if [ "$choice" -eq 2 ] || [ "$choice" -eq 3 ]; then
@@ -278,12 +98,11 @@ fi
 
     # Commands to install and configure Gost
     sudo apt install wget nano -y && \
-echo $'\e[32mInstalling Gost version 2.11.5, please wait...\e[0m' && \
-wget https://github.com/ginuerzh/gost/releases/download/v2.11.5/gost-linux-amd64-2.11.5.gz && \
-echo $'\e[32mGost downloaded successfully.\e[0m' && \
-gunzip gost-linux-amd64-2.11.5.gz && \
-sudo mv gost-linux-amd64-2.11.5 /usr/local/bin/gost && \
-sudo chmod +x /usr/local/bin/gost && \
+if [ "$gost_version_choice" -eq 2 ]; then
+    echo $'\e[32mInstalling Gost version 3.0.0, please wait...\e[0m'
+    wget -O /tmp/gost.tar.gz https://github.com/go-gost/gost/releases/download/v3.0.0-nightly.20240704/gost_3.0.0-nightly.20240704_linux_amd64.tar.gz
+    tar -xvzf /tmp/gost.tar.gz -C /usr/local/bin/
+    chmod +x /usr/local/bin/gost
 echo $'\e[32mGost installed successfully.\e[0m'
 
     # Create systemd service file without displaying content
@@ -359,8 +178,150 @@ EOL
     sudo systemctl restart gost.service
     echo $'\e[32mGost configuration applied successfully.\e[0m'
 
-# If option 3 is selected
-elif [ "$choice" -eq 3 ]; then
+# If option 4 is selected
+elif [ "$choice" -eq 4 ]; then
+    # Check if Gost is installed
+    if command -v gost &>/dev/null; then
+        echo $'\e[32mGost is installed. Checking configuration and status...\e[0m'
+        
+        # Check Gost configuration and status
+        systemctl list-unit-files | grep -q "gost_"
+        if [ $? -eq 0 ]; then
+            echo $'\e[32mGost is configured and active.\e[0m'
+            
+            # Get and display used IPs and ports
+            for service_file in /usr/lib/systemd/system/gost_*.service; do
+                # Extract the IP, port, and protocol information using awk
+                service_info=$(awk -F'[-=:/\\[\\]]+' '/ExecStart=/ {print $14,$15,$22,$20,$23}' "$service_file")
+
+                # Split the extracted information into an array
+                read -a info_array <<< "$service_info"
+
+                # Display IP, port, and protocol information with corrected port range
+                echo -e "\e[97mIP:\e[0m ${info_array[0]} \e[97mPort:\e[0m ${info_array[1]},... \e[97mProtocol:\e[0m ${info_array[2]}"
+
+            done
+        else
+            echo $'\e[33mGost is installed, but not configured or active.\e[0m'
+        fi
+    else
+        echo $'\e[33mGost Tunnel is not installed. \e[0m'
+    fi
+
+    read -n 1 -s -r -p $'\e[36m0. \e[0mBack to menu: \e[0m' choice
+
+if [ "$choice" -eq 0 ]; then
+    bash "$0"
+fi
+
+# If option 5 is selected
+elif [ "$choice" -eq 5 ]; then
+    echo $'\e[32mChoose Auto Restart option:\e[0m'
+    echo $'\e[36m1. \e[0mEnable Auto Restart'
+    echo $'\e[36m2. \e[0mDisable Auto Restart'
+
+    # Read user input for Auto Restart option
+    read -p $'\e[97mYour choice: \e[0m' auto_restart_option
+
+    # Process user choice for Auto Restart
+    case "$auto_restart_option" in
+        1)
+            # Logic to enable Auto Restart
+            echo $'\e[32mAuto Restart Enabled.\e[0m'
+            # Remove any existing scheduled restart using 'at' command
+            sudo at -l | awk '{print $1}' | xargs -I {} atrm {}
+            # Prompt the user for the restart time in hours
+            read -p $'\e[97mEnter the restart time in hours: \e[0m' restart_time_hours
+
+            # Convert hours to minutes
+            restart_time_minutes=$((restart_time_hours * 60))
+
+            # Write a script to restart Gost
+            echo -e "#!/bin/bash\n\nsudo systemctl daemon-reload\nsudo systemctl restart gost_*.service" | sudo tee /usr/bin/auto_restart_cronjob.sh > /dev/null
+
+            # Give execute permission to the script
+            sudo chmod +x /usr/bin/auto_restart_cronjob.sh
+
+            # Remove any existing cron job for Auto Restart
+            crontab -l | grep -v '/usr/bin/auto_restart_cronjob.sh' | crontab -
+
+            # Write a new cron job to execute the script at the specified intervals
+            (crontab -l ; echo "0 */$restart_time_hours * * * /usr/bin/auto_restart_cronjob.sh") | crontab -
+
+            echo $'\e[32mAuto Restart scheduled successfully.\e[0m'
+            ;;
+        2)
+            # Logic to disable Auto Restart
+            echo $'\e[32mAuto Restart Disabled.\e[0m'
+            # Remove the script and cron job for Auto Restart
+            sudo rm -f /usr/bin/auto_restart_cronjob.sh
+            crontab -l | grep -v '/usr/bin/auto_restart_cronjob.sh' | crontab -
+
+            echo $'\e[32mAuto Restart disabled successfully.\e[0m'
+            ;;
+        *)
+            echo $'\e[31mInvalid choice. Exiting...\e[0m'
+            exit
+            ;;
+    esac
+ bash "$0"
+fi
+
+# If option 6 is selected
+if [ "$choice" -eq 6 ]; then
+    echo $'\e[32mChoose Auto Clear Cache option:\e[0m'
+    echo $'\e[36m1. \e[0mEnable Auto Clear Cache'
+    echo $'\e[36m2. \e[0mDisable Auto Clear Cache'
+
+    # Read user input for Auto Clear Cache option
+    read -p $'\e[97mYour choice: \e[0m' auto_clear_cache_option
+
+    # Process user choice for Auto Clear Cache
+    case "$auto_clear_cache_option" in
+        1)
+            # Enable Auto Clear Cache
+            enable_auto_clear_cache() {
+                echo $'\e[32mAuto Clear Cache Enabled.\e[0m'
+                
+                # Prompt user to choose the interval in days
+                read -p $'\e[97mEnter the interval in days (e.g., 1 for daily, 7 for weekly): \e[0m' interval_days
+                
+                # Set up the cron job based on the interval
+                cron_interval="0 0 */$interval_days * *"
+
+                # Write a new cron job to execute the cache clearing commands at the specified interval
+                (crontab -l 2>/dev/null; echo "$cron_interval sync; echo 1 > /proc/sys/vm/drop_caches && sync; echo 2 > /proc/sys/vm/drop_caches && sync; echo 3 > /proc/sys/vm/drop_caches") | crontab -
+
+                echo $'\e[32mAuto Clear Cache scheduled successfully.\e[0m'
+            }
+
+            # Call the function to enable Auto Clear Cache
+            enable_auto_clear_cache
+            ;;
+        2)
+            # Disable Auto Clear Cache
+            disable_auto_clear_cache() {
+                echo $'\e[32mAuto Clear Cache Disabled.\e[0m'
+                
+                # Remove only the cron job related to auto clearing cache
+                crontab -l | grep -v "drop_caches" | crontab -
+
+                echo $'\e[32mAuto Clear Cache disabled successfully.\e[0m'
+            }
+
+            # Call the function to disable Auto Clear Cache
+            disable_auto_clear_cache
+            ;;
+        *)
+            echo $'\e[31mInvalid choice. Exiting...\e[0m'
+            exit
+            ;;
+    esac
+ bash "$0"
+fi
+
+# If option 7 is selected
+elif [ "$choice" -eq 7 ]; then
     # Countdown for uninstallation in a single line
     echo $'\e[32mUninstalling Gost in 3 seconds... \e[0m' && sleep 1 && echo $'\e[32m2... \e[0m' && sleep 1 && echo $'\e[32m1... \e[0m' && sleep 1 && { sudo rm -f /usr/local/bin/gost && sudo rm -f /usr/lib/systemd/system/gost.service && echo $'\e[32mGost successfully uninstalled.\e[0m'; }
 
