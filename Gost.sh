@@ -73,7 +73,7 @@ if [ "$choice" -eq 2 ] || [ "$choice" -eq 3 ]; then
         IFS=',' read -ra port_array <<< "$port_range"
         ports=$(IFS=,; echo "${port_array[*]}")
     else
-        echo $'\e[31mInvalid option. Exit...\e[0m'
+        echo $'\e[31mInvalid option. Exiting...\e[0m'
         exit
     fi
 
@@ -97,11 +97,12 @@ fi
 
     # Commands to install and configure Gost
     sudo apt install wget nano -y && \
-if [ "$gost_version_choice" -eq 2 ]; then
-    echo $'\e[32mInstalling Gost version 3.0.0, please wait...\e[0m'
-    wget -O /tmp/gost.tar.gz https://github.com/go-gost/gost/releases/download/v3.0.0-nightly.20240704/gost_3.0.0-nightly.20240704_linux_amd64.tar.gz
-    tar -xvzf /tmp/gost.tar.gz -C /usr/local/bin/
-    chmod +x /usr/local/bin/gost
+echo $'\e[32mInstalling Gost version 2.11.5, please wait...\e[0m' && \
+wget https://github.com/ginuerzh/gost/releases/download/v2.11.5/gost-linux-amd64-2.11.5.gz && \
+echo $'\e[32mGost downloaded successfully.\e[0m' && \
+gunzip gost-linux-amd64-2.11.5.gz && \
+sudo mv gost-linux-amd64-2.11.5 /usr/local/bin/gost && \
+sudo chmod +x /usr/local/bin/gost && \
 echo $'\e[32mGost installed successfully.\e[0m'
 
     # Create systemd service file without displaying content
