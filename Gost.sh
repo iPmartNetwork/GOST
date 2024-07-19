@@ -6,6 +6,101 @@ if [ "$EUID" -ne 0 ]; then
   exit
 fi
 
+# Paths
+HOST_PATH="/etc/hosts"
+DNS_PATH="/etc/resolv.conf"
+
+# Green, Yellow & Red Messages.
+green_msg() {
+    tput setaf 2
+    echo "[*] ----- $1"
+    tput sgr0
+}
+
+yellow_msg() {
+    tput setaf 3
+    echo "[*] ----- $1"
+    tput sgr0
+}
+
+red_msg() {
+    tput setaf 1
+    echo "[*] ----- $1"
+    tput sgr0
+}
+
+# Function to update system and install sqlite3
+install_dependencies() {
+    echo -e "${BLUE}Updating package list...${NC}"
+    sudo apt update -y
+
+    echo -e "${BLUE}Installing openssl...${NC}"
+    sudo apt install -y openssl
+
+    echo -e "${BLUE}Installing jq...${NC}"
+    sudo apt install -y jq
+
+    echo -e "${BLUE}Installing curl...${NC}"
+    sudo apt install -y curl
+
+    echo -e "${BLUE}Installing ufw...${NC}"
+    sudo apt install -y ufw
+
+    sudo apt -y install apt-transport-https locales apt-utils bash-completion libssl-dev socat
+
+    sudo apt -y -q autoclean
+    sudo apt -y clean
+    sudo apt -q update
+    sudo apt -y autoremove --purge
+}
+check_root() {
+    if [[ $EUID -ne 0 ]]; then
+        echo -e "${Purple}This script must be run as root. Please run it with sudo.${NC}"
+        exit 1
+    fi
+}
+
+fix_etc_hosts(){
+  echo
+  yellow_msg "Fixing Hosts file."
+  sleep 0.5
+
+  cp $HOST_PATH /etc/hosts.bak
+  yellow_msg "Default hosts file saved. Directory: /etc/hosts.bak"
+  sleep 0.5
+
+  # shellcheck disable=SC2046
+  if ! grep -q $(hostname) $HOST_PATH; then
+    echo "127.0.1.1 $(hostname)" | sudo tee -a $HOST_PATH > /dev/null
+    green_msg "Hosts Fixed."
+    echo
+    sleep 0.5
+  else
+    green_msg "Hosts OK. No changes made."
+    echo
+    sleep 0.5
+  fi
+}
+
+fix_dns(){
+    echo
+    yellow_msg "Fixing DNS Temporarily."
+    sleep 0.5
+
+    cp $DNS_PATH /etc/resolv.conf.bak
+    yellow_msg "Default resolv.conf file saved. Directory: /etc/resolv.conf.bak"
+    sleep 0.5
+
+    sed -i '/nameserver/d' $DNS_PATH
+
+    echo "nameserver 8.8.8.8" >> $DNS_PATH
+    echo "nameserver 8.8.4.4" >> $DNS_PATH
+
+    green_msg "DNS Fixed Temporarily."
+    echo
+    sleep 0.5
+}
+
 # Color codes
 Purple='\033[0;35m'
 Cyan='\033[0;36m'
