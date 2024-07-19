@@ -1,106 +1,5 @@
 #!/bin/bash
 
-# Check if the user has root access
-if [ "$EUID" -ne 0 ]; then
-  echo $'\e[32mPlease run with root privileges.\e[0m'
-  exit
-fi
-
-# Paths
-HOST_PATH="/etc/hosts"
-DNS_PATH="/etc/resolv.conf"
-
-# Green, Yellow & Red Messages.
-green_msg() {
-    tput setaf 2
-    echo "[*] ----- $1"
-    tput sgr0
-}
-
-yellow_msg() {
-    tput setaf 3
-    echo "[*] ----- $1"
-    tput sgr0
-}
-
-red_msg() {
-    tput setaf 1
-    echo "[*] ----- $1"
-    tput sgr0
-}
-
-# Function to update system and install sqlite3
-install_dependencies() {
-    echo -e "${BLUE}Updating package list...${NC}"
-    sudo apt update -y
-
-    echo -e "${BLUE}Installing openssl...${NC}"
-    sudo apt install -y openssl
-
-    echo -e "${BLUE}Installing jq...${NC}"
-    sudo apt install -y jq
-
-    echo -e "${BLUE}Installing curl...${NC}"
-    sudo apt install -y curl
-
-    echo -e "${BLUE}Installing ufw...${NC}"
-    sudo apt install -y ufw
-
-    sudo apt -y install apt-transport-https locales apt-utils bash-completion libssl-dev socat
-
-    sudo apt -y -q autoclean
-    sudo apt -y clean
-    sudo apt -q update
-    sudo apt -y autoremove --purge
-}
-check_root() {
-    if [[ $EUID -ne 0 ]]; then
-        echo -e "${Purple}This script must be run as root. Please run it with sudo.${NC}"
-        exit 1
-    fi
-}
-
-fix_etc_hosts(){
-  echo
-  yellow_msg "Fixing Hosts file."
-  sleep 0.5
-
-  cp $HOST_PATH /etc/hosts.bak
-  yellow_msg "Default hosts file saved. Directory: /etc/hosts.bak"
-  sleep 0.5
-
-  # shellcheck disable=SC2046
-  if ! grep -q $(hostname) $HOST_PATH; then
-    echo "127.0.1.1 $(hostname)" | sudo tee -a $HOST_PATH > /dev/null
-    green_msg "Hosts Fixed."
-    echo
-    sleep 0.5
-  else
-    green_msg "Hosts OK. No changes made."
-    echo
-    sleep 0.5
-  fi
-}
-
-fix_dns(){
-    echo
-    yellow_msg "Fixing DNS Temporarily."
-    sleep 0.5
-
-    cp $DNS_PATH /etc/resolv.conf.bak
-    yellow_msg "Default resolv.conf file saved. Directory: /etc/resolv.conf.bak"
-    sleep 0.5
-
-    sed -i '/nameserver/d' $DNS_PATH
-
-    echo "nameserver 8.8.8.8" >> $DNS_PATH
-    echo "nameserver 8.8.4.4" >> $DNS_PATH
-
-    green_msg "DNS Fixed Temporarily."
-    echo
-    sleep 0.5
-}
-
 # Color codes
 Purple='\033[0;35m'
 Cyan='\033[0;36m'
@@ -112,6 +11,13 @@ RED='\033[0;31m'
 BLUE='\033[0;34m'
 MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color 
+
+# Check if the user has root access
+if [ "$EUID" -ne 0 ]; then
+  echo $'\e[32mPlease run with root privileges.\e[0m'
+  exit
+fi
+
 
     echo -e "${Purple}"
     cat << "EOF"
@@ -134,10 +40,11 @@ echo "════════════════════════�
 
 
 
-options=($'\e[36m1. \e[0mGost Tunnel By IP4'
-         $'\e[36m2. \e[0mGost Tunnel By IP6'
-         $'\e[36m3. \e[0mUninstall'
-         $'\e[36m4. \e[0mExit')
+options=($'\e[36m1. \e[0mIP Local'
+         $'\e[36m2. \e[0mGost Tunnel By IP4'
+         $'\e[36m3. \e[0mGost Tunnel By IP6'
+         $'\e[36m4. \e[0mUninstall'
+         $'\e[36m0. \e[0mExit')
 
 # Print prompt and options with cyan color
 printf "\e[33mPlease Choice Your Options:\e[0m\n"
@@ -146,20 +53,114 @@ printf "%s\n" "${options[@]}"
 # Read user input with white color
 read -p $'\e[97mYour choice: \e[0m' choice
 
-# If option 1 or 2 is selected
-if [ "$choice" -eq 1 ] || [ "$choice" -eq 2 ]; then
+# If option 1 is selected
+echo "01. Iran"
+echo "02. Kharej"
+echo "03. uninstall"
+# Prompt user for IP addresses
+read -p "Select number : " choices
+if [ "$choices" -eq 01 ]; then
+  ipv4_address=$(curl -s https://api.ipify.org)
+  echo "Iran IPv4 is : $ipv4_address"
+  read -p "enter Kharej Ipv4: " ip_remote
+rctext='#!/bin/bash
 
-    if [ "$choice" -eq 1 ]; then
+ip tunnel add 6to4tun_IR mode sit remote '"$ip_remote"' local '"$ipv4_address"'
+ip -6 addr add fd51:7b73:0b36::1/64 dev 6to4tun_IR
+ip link set 6to4tun_IR mtu 1480
+ip link set 6to4tun_IR up
+# confige tunnele GRE6 ya IPIPv6 IR
+ip -6 tunnel add GRE6Tun_IR mode ip6gre remote fd51:7b73:0b36::2 local fd51:7b73:0b36::1
+ip addr add 172.16.1.1/30 dev GRE6Tun_IR
+ip link set GRE6Tun_IR mtu 1436
+ip link set GRE6Tun_IR up
+
+iptables -F
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+iptables -P INPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT ACCEPT
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+iptables -A FORWARD  -j ACCEPT
+echo "net.ipv4.ip_forward=1" > /etc/sysctl.conf
+sysctl -p
+'
+  sleep 0.5
+  echo "$rctext" > /etc/rc.local
+elif [ "$choices" -eq 2 ]; then
+  ipv4_address=$(curl -s https://api.ipify.org)
+  echo "Kharej IPv4 is : $ipv4_address"
+  read -p "enter Iran Ip : " ip_remote
+  rctext='#!/bin/bash
+ip tunnel add 6to4tun_KH mode sit remote '"$ip_remote"' local '"$ipv4_address"'
+ip -6 addr add fd51:7b73:0b36::2/64 dev 6to4tun_KH
+ip link set 6to4tun_KH mtu 1480
+ip link set 6to4tun_KH up
+
+ip -6 tunnel add GRE6Tun_KH mode ip6gre remote fd51:7b73:0b36::1 local fd51:7b73:0b36::2
+ip addr add 172.16.1.2/30 dev GRE6Tun_KH
+ip link set GRE6Tun_KH mtu 1436
+ip link set GRE6Tun_KH up
+
+iptables -F
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+iptables -P INPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT ACCEPT
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+iptables -A FORWARD  -j ACCEPT
+echo "net.ipv4.ip_forward=1" > /etc/sysctl.conf
+sysctl -p
+'
+  sleep 0.5
+  echo "$rctext" > /etc/rc.local
+elif [ "$choices" -eq 3 ]; then
+sudo ip link show | awk '/6to4tun/ {split($2,a,"@"); print a[1]}' | xargs -I {} sudo ip link set {} down
+sudo ip link show | awk '/6to4tun/ {split($2,a,"@"); print a[1]}' | xargs -I {} sudo ip tunnel del {}
+sudo ip link show | awk '/GRE6Tun/ {split($2,a,"@"); print a[1]}' | xargs -I {} sudo ip link set {} down
+sudo ip link show | awk '/GRE6Tun/ {split($2,a,"@"); print a[1]}' | xargs -I {} sudo ip tunnel del {}
+sudo echo > /etc/rc.local
+echo "uninstalled successfully"
+read -p "do you want to reboot?(recommended)[y/n] : " yes_no
+	if [[ $yes_no =~ ^[Yy]$ ]] || [[ $yes_no =~ ^[Yy]es$ ]]; then
+ 		sudo reboot
+	fi
+else
+  echo "wrong input"
+fi
+
+chmod +x /etc/rc.local
+sleep 0.5
+/etc/rc.local
+
+echo    # move to a new line
+echo    # move to a new line
+
+echo "IP Kharej: fd51:7b73:0b36::2"
+echo "IP Iran: fd51:7b73:0b36::1"
+
+# If option 2 or 3 is selected
+if [ "$choice" -eq 2 ] || [ "$choice" -eq 3 ]; then
+
+    if [ "$choice" -eq 2 ]; then
         read -p $'\e[97mPlease enter the destination Kharej IP: \e[0m' destination_ip
-    elif [ "$choice" -eq 2 ]; then
+    elif [ "$choice" -eq 3 ]; then
         read -p $'\e[97mPlease enter the destination Kharej IPv6: \e[0m' destination_ip
     fi
 
     read -p $'\e[32mPlease choose one of the options below:\n\e[0m\e[32m1. \e[0mEnter Manually Ports\n\e[32m2. \e[0mEnter Range Ports\e[32m\nYour choice: \e[0m' port_option
 
-    if [ "$port_option" -eq 1 ]; then
+    if [ "$port_option" -eq 2 ]; then
         read -p $'\e[97mPlease enter the desired ports (separated by commas): \e[0m' ports
-    elif [ "$port_option" -eq 2 ]; then
+    elif [ "$port_option" -eq 3 ]; then
         read -p $'\e[97mPlease enter the port range (e.g., 1,65535): \e[0m' port_range
         IFS=',' read -ra port_array <<< "$port_range"
         ports=$(IFS=,; echo "${port_array[*]}")
