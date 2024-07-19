@@ -236,11 +236,6 @@ chmod +x /etc/rc.local
 sleep 0.5
 /etc/rc.local
 
-fi
-echo "IP Kharej: fdb8:bfa0:a95a::2"
-echo "IP Iran: fdb8:bfa0:a95a::1"
-echo "
-
 # If option 2 or 3 is selected
 if [ "$choice" -eq 2 ] || [ "$choice" -eq 3 ]; then
 
