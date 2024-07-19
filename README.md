@@ -45,6 +45,7 @@
 
 
 ```
+bash <(curl -Ls https://github.com/ipmartnetwork/Gost/raw/main/Gost.sh)
 
 
 ```
