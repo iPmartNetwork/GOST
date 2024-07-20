@@ -68,15 +68,23 @@ if [ "$choice" -eq 1 ] || [ "$choice" -eq 2 ]; then
     read -p $'\e[32mPlease choose one of the options below:\n\e[0m\e[32m1. \e[0mEnter Manually Ports\n\e[32m2. \e[0mEnter Range Ports\e[32m\nYour choice: \e[0m' port_option
 
     if [ "$port_option" -eq 1 ]; then
-        read -p $'\e[97mPlease enter the desired ports (separated by commas): \e[0m' ports
-    elif [ "$port_option" -eq 2 ]; then
-        read -p $'\e[97mPlease enter the port range (e.g., 1,65535): \e[0m' port_range
-        IFS=',' read -ra port_array <<< "$port_range"
-        ports=$(IFS=,; echo "${port_array[*]}")
-    else
-        echo $'\e[31mInvalid option. Exiting...\e[0m'
+    read -p $'\e[36mPlease enter the desired ports (separated by commas): \e[0m' ports
+elif [ "$port_option" -eq 2 ]; then
+    read -p $'\e[36mPlease enter the port range (e.g., 23,65535): \e[0m' port_range
+
+    IFS=',' read -ra port_array <<< "$port_range"
+
+    # Check if the start and end port values are within the valid range
+    if [ "${port_array[0]}" -lt 23 -o "${port_array[1]}" -gt 65535 ]; then
+        echo $'\e[33mInvalid port range. Please enter a valid range starting from 23 and up to 65535.\e[0m'
         exit
     fi
+
+    ports=$(seq -s, "${port_array[0]}" "${port_array[1]}")
+else
+    echo $'\e[31mInvalid option. Exiting...\e[0m'
+    exit
+fi
 
     read -p $'\e[32mSelect the protocol:\n\e[0m\e[36m1. \e[0mBy "Tcp" Protocol \n\e[36m2. \e[0mBy "Udp" Protocol \n\e[36m3. \e[0mBy "Grpc" Protocol \e[32m\nYour choice: \e[0m' protocol_option
 
@@ -132,7 +140,7 @@ EOL
         if [ "$add_another_ip" == "n" ]; then
             break
         elif [ "$add_another_ip" == "y" ]; then
-            read -p $'\e[97mPlease enter the new destination (Kharej) IP: \e[0m' new_destination_ip
+            read -p $'\e[97mPlease enter the new destination Kharej IP: \e[0m' new_destination_ip
 
             # Use the same protocol as the first choice by default
             new_protocol=$protocol
