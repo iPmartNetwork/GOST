@@ -110,10 +110,29 @@ fi
     wget -O /tmp/gost.tar.gz https://github.com/iPmartNetwork/GOST/releases/download/v3.0.0-nightly.20240715/gost.tar.gz
     tar -xvzf /tmp/gost.tar.gz -C /usr/local/bin/
     chmod +x /usr/local/bin/gost
-    echo $'\e[32mGost installed successfully.\e[0m'
+   echo $'\e[32mGost installed successfully.\e[0m'
+else
+    echo $'\e[31mInvalid choice. Exiting...\e[0m'
+    exit
+fi
+    fi
+    # Continue creating the systemd service file
+    exec_start_command="ExecStart=/usr/local/bin/gost"
 
-    # Create systemd service file without displaying content
-    cat <<EOL | sudo tee /usr/lib/systemd/system/gost.service > /dev/null
+    # Add lines for each port
+    IFS=',' read -ra port_array <<< "$ports"
+    port_count=${#port_array[@]}
+
+    # Set the maximum number of ports per file
+    max_ports_per_file=12000
+
+    # Calculate the number of files needed
+    file_count=$(( (port_count + max_ports_per_file - 1) / max_ports_per_file ))
+
+    # Continue creating the systemd service files
+    for ((file_index = 0; file_index < file_count; file_index++)); do
+        # Create a new systemd service file
+        cat <<EOL | sudo tee "/usr/lib/systemd/system/gost_$file_index.service" > /dev/null
 [Unit]
 Description=GO Simple Tunnel
 After=network.target
@@ -121,6 +140,7 @@ Wants=network.target
 
 [Service]
 Type=simple
+Environment="GOST_LOGGER_LEVEL=fatal"
 EOL
 
     # Variable to store the ExecStart command
