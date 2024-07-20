@@ -114,14 +114,14 @@ fi
 
     # Create systemd service file without displaying content
     cat <<EOL | sudo tee /usr/lib/systemd/system/gost.service > /dev/null
-    [Unit]
-    Description=GO Simple Tunnel
-    After=network.target
-    Wants=network.target
+[Unit]
+Description=GO Simple Tunnel
+After=network.target
+Wants=network.target
 
-    [Service]
-    Type=simple
-    EOL
+[Service]
+Type=simple
+EOL
 
     # Variable to store the ExecStart command
     exec_start_command="ExecStart=/usr/local/bin/gost"
