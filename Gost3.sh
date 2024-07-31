@@ -3,7 +3,7 @@ Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_p
 Info="${Green_font_prefix}[info]${Font_color_suffix}"
 Error="${Red_font_prefix}[error]${Font_color_suffix}"
 shell_version="V3"
-ct_new_ver="2.11.5" # 2.x 
+ct_new_ver="3.0.0" # 3.x 
 gost_conf_path="/etc/gost/config.json"
 raw_conf_path="/etc/gost/rawconf"
 function checknew() {
@@ -97,7 +97,7 @@ function Install_ct() {
   [[ -z ${addyn} ]] && addyn="n"
   if [[ ${addyn} == [Yy] ]]; then
     rm -rf gost-linux-"$bit"-"$ct_new_ver".gz
-    wget --no-check-certificate https://github.com/iPmartNetwork/GOST/releases/download/v2.11.5/gost-linux-amd64-2.11.5.gz
+    wget --no-check-certificate https://github.com/iPmartNetwork/GOST/releases/download/v3.0.0-nightly.20240715/gost_3.0.0-nightly.20240715_linux_amd64.tar.gz
     gunzip gost-linux-"$bit"-"$ct_new_ver".gz
     mv gost-linux-"$bit"-"$ct_new_ver" gost
     mv gost /usr/bin/gost
