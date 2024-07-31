@@ -65,7 +65,7 @@ function check_new_ver() {
   # deprecated
   ct_new_ver=$(wget --no-check-certificate -qO- -t2 -T3 https://api.github.com/repos/ipmartnetwork/Gost/releases/latest | grep "tag_name" | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//g;s/ //g;s/v//g')
   if [[ -z ${ct_new_ver} ]]; then
-    ct_new_ver="2.11.2"
+    ct_new_ver="v3.0.0-nightly.20240715"
     echo -e "${Error} gost neweset version gain failed，downloading v${ct_new_ver}"
   else
     echo -e "${Info} gost current version is ${ct_new_ver}"
@@ -92,7 +92,7 @@ function Install_ct() {
   check_file
   check_sys
   # check_new_ver
-  echo -e "in China choose Y, or N"
+  echo -e "choose Y, or N"
   read -e -p "[y/n]:" addyn
   [[ -z ${addyn} ]] && addyn="n"
   if [[ ${addyn} == [Yy] ]]; then
