@@ -880,7 +880,7 @@ update_sh() {
 }
 
 update_sh
-update_sh
+clear
 echo && echo -e "                 gost one key install config script"${Red_font_prefix}[${shell_version}]${Font_color_suffix}"
 
   Features: 
