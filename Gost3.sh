@@ -887,7 +887,10 @@ echo && echo -e "                 gost one key install config script"${Red_font_
         (1)This script uses systemd and gost configuration files to manage gost.
         (2)Able to implement multiple forwarding rules to take effect at the same time without using other tools (such as screen)
         (3)The forwarding does not fail after the machine reboots.
-  Function: (1) tcp+udp unencrypted forwarding, (2) transit machine encrypted forwarding, (3) landing machine decryption and docking forwarding
+  Function: 
+        (1) tcp+udp unencrypted forwarding, 
+	(2) transit machine encrypted forwarding, 
+        (3) landing machine decryption and docking forwarding
 
  ${Green_font_prefix}1.${Font_color_suffix} install gost
  ${Green_font_prefix}2.${Font_color_suffix} update gost
@@ -941,7 +944,7 @@ case "$num" in
 9)
   show_all_conf
   read -p "Please enter the configuration number you want to delete：" numdelete
-  if echo $numdelete | grep -q '[0-9]'; then
+  if echo $numdelete | grep -q '[0-11]'; then
     sed -i "${numdelete}d" $raw_conf_path
     rm -rf /etc/gost/config.json
     confstart
