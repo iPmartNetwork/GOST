@@ -35,6 +35,10 @@ bash <(curl -Ls https://github.com/ipmartnetwork/Gost/raw/main/Gost.sh)
 ```
 
 
+```
+bash <(curl -Ls https://github.com/ipmartnetwork/Gost/raw/main/Gost3.sh)
+
+```
 
 
 
