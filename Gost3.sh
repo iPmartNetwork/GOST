@@ -92,7 +92,7 @@ function Install_ct() {
   check_file
   check_sys
   # check_new_ver
-  echo -e "in China choose Y, or N"
+  echo -e "choose Y, or N"
   read -e -p "[y/n]:" addyn
   [[ -z ${addyn} ]] && addyn="n"
   if [[ ${addyn} == [Yy] ]]; then
