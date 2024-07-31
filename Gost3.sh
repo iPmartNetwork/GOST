@@ -880,15 +880,14 @@ update_sh() {
 }
 
 update_sh
-echo && echo -e "
-══════════════════════════════════════════════════════════════════════════════════════
-        ____                             _     _                                     
-    ,   /    )                           /|   /                                  /   
--------/____/---_--_----__---)__--_/_---/-| -/-----__--_/_-----------__---)__---/-__-
-  /   /        / /  ) /   ) /   ) /    /  | /    /___) /   | /| /  /   ) /   ) /(    
-_/___/________/_/__/_(___(_/_____(_ __/___|/____(___ _(_ __|/_|/__(___/_/_____/___\__
+update_sh
+echo && echo -e "                 gost one key install config script"${Red_font_prefix}[${shell_version}]${Font_color_suffix}"
 
-══════════════════════════════════════════════════════════════════════════════════════
+  Features: 
+        (1)This script uses systemd and gost configuration files to manage gost.
+        (2)Able to implement multiple forwarding rules to take effect at the same time without using other tools (such as screen)
+        (3)The forwarding does not fail after the machine reboots.
+  Function: (1) tcp+udp unencrypted forwarding, (2) transit machine encrypted forwarding, (3) landing machine decryption and docking forwarding
 
  ${Green_font_prefix}1.${Font_color_suffix} install gost
  ${Green_font_prefix}2.${Font_color_suffix} update gost
