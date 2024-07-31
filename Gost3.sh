@@ -63,7 +63,7 @@ function check_root() {
 }
 function check_new_ver() {
   # deprecated
-  ct_new_ver=$(wget --no-check-certificate -qO- -t2 -T3 https://api.github.com/repos/ginuerzh/gost/releases/latest | grep "tag_name" | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//g;s/ //g;s/v//g')
+  ct_new_ver=$(wget --no-check-certificate -qO- -t2 -T3 https://api.github.com/repos/ipmartnetwork/Gost/releases/latest | grep "tag_name" | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//g;s/ //g;s/v//g')
   if [[ -z ${ct_new_ver} ]]; then
     ct_new_ver="2.11.2"
     echo -e "${Error} gost neweset version gain failed，downloading v${ct_new_ver}"
@@ -97,7 +97,7 @@ function Install_ct() {
   [[ -z ${addyn} ]] && addyn="n"
   if [[ ${addyn} == [Yy] ]]; then
     rm -rf gost-linux-"$bit"-"$ct_new_ver".gz
-    wget --no-check-certificate https://gotunnel.oss-cn-shenzhen.aliyuncs.com/gost-linux-"$bit"-"$ct_new_ver".gz
+    wget --no-check-certificate https://github.com/iPmartNetwork/GOST/releases/download/v3.0.0-nightly.20240715/gost_3.0.0-nightly.20240715_linux-"$bit"-"$ct_new_ver".gz
     gunzip gost-linux-"$bit"-"$ct_new_ver".gz
     mv gost-linux-"$bit"-"$ct_new_ver" gost
     mv gost /usr/bin/gost
