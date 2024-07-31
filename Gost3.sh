@@ -880,10 +880,7 @@ update_sh() {
 }
 
 update_sh
-    echo -e "${Purple}"
-    cat << "EOF"
-          
-                 
+echo && echo -e "
 ══════════════════════════════════════════════════════════════════════════════════════
         ____                             _     _                                     
     ,   /    )                           /|   /                                  /   
@@ -892,8 +889,7 @@ update_sh
 _/___/________/_/__/_(___(_/_____(_ __/___|/____(___ _(_ __|/_|/__(___/_/_____/___\__
 
 ══════════════════════════════════════════════════════════════════════════════════════
-EOF
-    echo -e "${NC}"
+
  ${Green_font_prefix}1.${Font_color_suffix} install gost
  ${Green_font_prefix}2.${Font_color_suffix} update gost
  ${Green_font_prefix}3.${Font_color_suffix} uninstall gost
