@@ -3,7 +3,7 @@ Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_p
 Info="${Green_font_prefix}[info]${Font_color_suffix}"
 Error="${Red_font_prefix}[error]${Font_color_suffix}"
 shell_version="v3"
-ct_new_ver="2.11.2" # 2.x No longer follow official updates
+ct_new_ver="v3.0.0-nightly.20240715" # 3.x No longer follow official updates
 gost_conf_path="/etc/gost/config.json"
 raw_conf_path="/etc/gost/rawconf"
 function checknew() {
