@@ -97,7 +97,7 @@ function Install_ct() {
   [[ -z ${addyn} ]] && addyn="n"
   if [[ ${addyn} == [Yy] ]]; then
     rm -rf gost-linux-"$bit"-"$ct_new_ver".gz
-    wget --no-check-certificate https://github.com/iPmartNetwork/GOST/releases/download/v3.0.0-nightly.20240715/gost_3.0.0-nightly.20240715_linux_amd64.tar.gz
+    wget --no-check-certificate https://github.com/iPmartNetwork/GOST/releases/download/v2.11.5/gost-linux-amd64-2.11.5.gz
     gunzip gost-linux-"$bit"-"$ct_new_ver".gz
     mv gost-linux-"$bit"-"$ct_new_ver" gost
     mv gost /usr/bin/gost
