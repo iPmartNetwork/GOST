@@ -110,6 +110,7 @@ echo $'\e[32mInstalling Gost version 3.0.0, please wait...\e[0m' && \
 wget https://github.com/iPmartNetwork/GOST/releases/download/v3.0.0-nightly.20240801/gost_3.0.0_linux_amd64.tar.gz && \
 echo $'\e[32mGost downloaded successfully.\e[0m' && \
 gunzip gost_3.0.0_linux_amd64.tar.gz && \
+mkdir /usr/local/bin/gost && \
 sudo mv gost_3.0.0_linux_amd64 /usr/local/bin/gost && \
 sudo chmod +x /usr/local/bin/gost && \
 echo $'\e[32mGost installed successfully.\e[0m'
