@@ -95,9 +95,9 @@ if [ "$choice" -eq 1 ] || [ "$choice" -eq 2 ]; then
     # Commands to install and configure Gost
     sudo apt install wget nano -y && \
     echo $'\e[32mInstalling Gost latest version, please wait...\e[0m' && \
-    wget https://github.com/ginuerzh/gost/releases/latest/download/gost-linux-amd64.gz && \
+    wget https://github.com/iPmartNetwork/GOST/releases/download/v3.0.0-nightly.20240801/gost_3.0.0_linux_amd64.tar.gz && \
     echo $'\e[32mGost downloaded successfully.\e[0m' && \
-    gunzip gost-linux-amd64.gz && \
+    gunzip gost_3.0.0_linux_amd64.tar.gz && \
     sudo mv gost-linux-amd64 /usr/local/bin/gost && \
     sudo chmod +x /usr/local/bin/gost && \
     echo $'\e[32mGost installed successfully.\e[0m'
@@ -156,4 +156,3 @@ EOL
                 exec_start_command+=" -L=$new_protocol://:$new_port/[$new_destination_ip]:$new_port"
             done
         else
-            echo $'\e[31
