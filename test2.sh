@@ -50,20 +50,3 @@ echo "0 * * * * root /usr/bin/ssh -f -N -L $PORT_START-$PORT_END:$REMOTE_IP:$REM
 
 # Apply Cron Job
 crontab $CRON_JOB
-
-# Uninstall Function
-uninstall() {
-  # Stop and Disable Service
-  systemctl stop $SERVICE_NAME
-  systemctl disable $SERVICE_NAME
-
-  # Remove Service File
-  rm /etc/systemd/system/$SERVICE_NAME.service
-
-  # Remove Cron Job
-  rm $CRON_JOB
-
-  echo "Uninstalled SSH Tunnel Service and Cron Job."
-}
-
-uninstall
